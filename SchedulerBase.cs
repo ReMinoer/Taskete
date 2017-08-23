@@ -104,7 +104,10 @@ namespace Diese.Scheduling
 
             SchedulerGraph<T>.Vertex vertex = SchedulerGraph.Vertices.FirstOrDefault(x => x.Predicate != null && x.Predicate(item));
             if (vertex != null)
+            {
+                ItemsVertex.Add(item, vertex);
                 vertex.Items.Add(item);
+            }
             else
                 vertex = AddItemVertex(item);
 

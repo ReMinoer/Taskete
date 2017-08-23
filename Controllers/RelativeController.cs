@@ -13,14 +13,11 @@
 
         public RelativeController<TController, T> Before(T dependent)
         {
-            SchedulerGraph<T>.Vertex otherVertex;
-            _scheduler.ItemsVertex.TryGetValue(dependent, out otherVertex);
-
-            if (otherVertex == null)
+            if (!_scheduler.ItemsVertex.TryGetValue(dependent, out SchedulerGraph<T>.Vertex otherVertex))
                 otherVertex = _scheduler.AddItemVertex(dependent);
 
-            var edge = new SchedulerGraph<T>.Edge();
-            _scheduler.SchedulerGraph.AddEdge(otherVertex, _vertex, edge);
+            if (!_scheduler.SchedulerGraph.ContainsEdge(otherVertex, _vertex))
+                _scheduler.SchedulerGraph.AddEdge(otherVertex, _vertex, new SchedulerGraph<T>.Edge());
 
             _scheduler.Refresh();
             return this;
@@ -28,14 +25,11 @@
 
         public RelativeController<TController, T> After(T dependency)
         {
-            SchedulerGraph<T>.Vertex otherVertex;
-            _scheduler.ItemsVertex.TryGetValue(dependency, out otherVertex);
-
-            if (otherVertex == null)
+            if (!_scheduler.ItemsVertex.TryGetValue(dependency, out SchedulerGraph<T>.Vertex otherVertex))
                 otherVertex = _scheduler.AddItemVertex(dependency);
 
-            var edge = new SchedulerGraph<T>.Edge();
-            _scheduler.SchedulerGraph.AddEdge(_vertex, otherVertex, edge);
+            if (!_scheduler.SchedulerGraph.ContainsEdge(_vertex, otherVertex))
+                _scheduler.SchedulerGraph.AddEdge(_vertex, otherVertex, new SchedulerGraph<T>.Edge());
 
             _scheduler.Refresh();
             return this;
