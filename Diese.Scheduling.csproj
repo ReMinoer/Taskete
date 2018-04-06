@@ -51,10 +51,6 @@
     <Compile Include="TopologicalOrderVisitor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Diese.Graph\Diese.Graph.csproj">
-      <Project>{bbc6c938-95a5-4cbf-aa6b-da2a9a09c4f1}</Project>
-      <Name>Diese.Graph</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Diese\Diese.csproj">
       <Project>{F2F3FEB2-8453-409E-B00C-96DC64AC8020}</Project>
       <Name>Diese</Name>
