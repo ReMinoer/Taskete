@@ -1,4 +1,4 @@
-﻿namespace Diese.Scheduling.Controllers
+﻿namespace Taskete.Controllers
 {
     public class PriorityController<TController, T> : IPriorityController<PriorityController<TController, T>>
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Diese.Graph;
+using OverGraphed;
 
-namespace Diese.Scheduling
+namespace Taskete
 {
     public class ReadOnlyScheduler<T> : IReadOnlyScheduler<T>
     {

@@ -1,4 +1,4 @@
-namespace Diese.Scheduling.Controllers
+namespace Taskete.Controllers
 {
     public interface IRelativeController<in T>
     {

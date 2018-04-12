@@ -1,7 +1,8 @@
 using System.Collections.Generic;
-using Diese.Graph;
+using Diese;
+using OverGraphed;
 
-namespace Diese.Scheduling
+namespace Taskete
 {
     public interface IReadOnlyScheduler<T>
     {

@@ -1,4 +1,4 @@
-﻿namespace Diese.Scheduling
+﻿namespace Taskete
 {
     public enum Priority
     {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Diese.Graph;
+using OverGraphed;
 
-namespace Diese.Scheduling
+namespace Taskete
 {
     public class SchedulerGraph<T> : Graph<SchedulerGraph<T>.Vertex, SchedulerGraph<T>.Edge>
     {

@@ -1,6 +1,6 @@
-﻿using Diese.Scheduling.Controllers;
+﻿using Taskete.Controllers;
 
-namespace Diese.Scheduling
+namespace Taskete
 {
     public interface ISchedulerController<T> : IRelativeController<ISchedulerController<T>, T>, IPriorityController<ISchedulerController<T>>
     {

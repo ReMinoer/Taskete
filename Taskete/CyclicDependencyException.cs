@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Diese.Scheduling
+namespace Taskete
 {
     public class CyclicDependencyException : Exception
     {

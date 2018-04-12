@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Diese.Graph;
+using Diese;
+using OverGraphed;
 
-namespace Diese.Scheduling
+namespace Taskete
 {
     public abstract class SchedulerBase<TController, T> : BatchTree<QueueBatchNode<T>>, IScheduler<TController, T>
     {

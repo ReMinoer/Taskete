@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using Diese.Graph;
+using OverGraphed;
 
-namespace Diese.Scheduling
+namespace Taskete
 {
     public class TopologicalOrderVisitor<T> : IVisitor<SchedulerGraph<T>.Vertex, SchedulerGraph<T>.Edge>
     {
@@ -14,7 +15,7 @@ namespace Diese.Scheduling
         public TopologicalOrderVisitor()
         {
             _result = new List<T>();
-            _readOnlyResult = _result.AsReadOnly();
+            _readOnlyResult = new ReadOnlyCollection<T>(_result);
 
             _visited = new Stack<SchedulerGraph<T>.Vertex>();
         }
