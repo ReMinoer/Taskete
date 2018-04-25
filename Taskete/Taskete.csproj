@@ -5,7 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\External\Diese\Diese\Diese.csproj" />
+    <PackageReference Include="ReMinoer.Diese" Version="0.1.0-alpha" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\External\OverGraphed\OverGraphed\OverGraphed.csproj" />
   </ItemGroup>
 

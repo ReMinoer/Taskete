@@ -3,13 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Taskete", "Taskete\Taskete.csproj", "{8D7ACB11-B64C-4288-BB51-D6CAC84F7738}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Taskete", "Taskete\Taskete.csproj", "{8D7ACB11-B64C-4288-BB51-D6CAC84F7738}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "External", "External", "{A64713B7-E66A-4C94-93A8-26F8104C7CCD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OverGraphed", "External\OverGraphed\OverGraphed\OverGraphed.csproj", "{A0D4D0B2-0522-4736-873E-B989582DF24A}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Diese", "External\Diese\Diese\Diese.csproj", "{7D26C4CB-7D04-4EF5-8574-94A5A78D2015}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,17 +23,12 @@ Global
 		{A0D4D0B2-0522-4736-873E-B989582DF24A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0D4D0B2-0522-4736-873E-B989582DF24A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A0D4D0B2-0522-4736-873E-B989582DF24A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7D26C4CB-7D04-4EF5-8574-94A5A78D2015}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7D26C4CB-7D04-4EF5-8574-94A5A78D2015}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7D26C4CB-7D04-4EF5-8574-94A5A78D2015}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7D26C4CB-7D04-4EF5-8574-94A5A78D2015}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A0D4D0B2-0522-4736-873E-B989582DF24A} = {A64713B7-E66A-4C94-93A8-26F8104C7CCD}
-		{7D26C4CB-7D04-4EF5-8574-94A5A78D2015} = {A64713B7-E66A-4C94-93A8-26F8104C7CCD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7191EF55-663B-421D-873C-BC9B43E3ADDC}
