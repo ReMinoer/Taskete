@@ -7,7 +7,7 @@ namespace Taskete
     public interface IReadOnlyScheduler<T>
     {
         IEnumerable<T> Planning { get; }
-        IGraphData<SchedulerGraph<T>.Vertex, SchedulerGraph<T>.Edge> GraphData { get; }
+        IGraph<SchedulerGraph<T>.Vertex, SchedulerGraph<T>.Edge> Graph { get; }
     }
 
     public interface IScheduler<T> : IReadOnlyScheduler<T>, IBatchTree

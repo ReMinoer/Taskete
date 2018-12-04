@@ -7,7 +7,7 @@ namespace Taskete
     {
         private readonly IScheduler<T> _scheduler;
         public IEnumerable<T> Planning => _scheduler.Planning;
-        public IGraphData<SchedulerGraph<T>.Vertex, SchedulerGraph<T>.Edge> GraphData => _scheduler.GraphData;
+        public IGraph<SchedulerGraph<T>.Vertex, SchedulerGraph<T>.Edge> Graph => _scheduler.Graph;
 
         public ReadOnlyScheduler(IScheduler<T> scheduler)
         {

@@ -25,7 +25,7 @@ namespace Taskete
             }
         }
 
-        public IGraphData<SchedulerGraph<T>.Vertex, SchedulerGraph<T>.Edge> GraphData { get; }
+        public IGraph<SchedulerGraph<T>.Vertex, SchedulerGraph<T>.Edge> Graph { get; }
 
         protected SchedulerBase()
         {
@@ -33,10 +33,10 @@ namespace Taskete
 
             SchedulerGraph = new SchedulerGraph<T>();
             _topologicalOrderVisitor = new TopologicalOrderVisitor<T>();
-            GraphData = new ReadOnlyGraph<SchedulerGraph<T>.Vertex, SchedulerGraph<T>.Edge>(SchedulerGraph);
+            Graph = new ReadOnlyGraph<SchedulerGraph<T>.Vertex, SchedulerGraph<T>.Edge>(SchedulerGraph);
         }
 
-        public void ApplyProfile(IGraphData<SchedulerGraph<Predicate<object>>.Vertex, SchedulerGraph<Predicate<object>>.Edge> profileGraph)
+        public void ApplyProfile(IGraph<SchedulerGraph<Predicate<object>>.Vertex, SchedulerGraph<Predicate<object>>.Edge> profileGraph)
         {
             BeginBatch();
             Clear();
@@ -46,11 +46,11 @@ namespace Taskete
             {
                 var vertex = new SchedulerGraph<T>.Vertex(predicateVertex.Items.First());
                 vertexDictionary[predicateVertex] = vertex;
-                SchedulerGraph.AddVertex(vertex);
+                SchedulerGraph.RegisterVertex(vertex);
             }
 
             foreach (SchedulerGraph<Predicate<object>>.Edge predicateEdge in profileGraph.Edges)
-                SchedulerGraph.AddEdge(vertexDictionary[predicateEdge.Start], vertexDictionary[predicateEdge.End], new SchedulerGraph<T>.Edge());
+                new SchedulerGraph<T>.Edge().Link(vertexDictionary[predicateEdge.Start], vertexDictionary[predicateEdge.End]);
 
             EndBatch();
         }
@@ -73,7 +73,8 @@ namespace Taskete
 
         public virtual void Unplan(T item)
         {
-            SchedulerGraph.ClearEdges(ItemsVertex[item]);
+            SchedulerGraph.UnregisterVertex(ItemsVertex[item]);
+            ItemsVertex[item].UnlinkEdges();
             Refresh();
         }
 
@@ -118,19 +119,22 @@ namespace Taskete
 
         protected void Remove(T item)
         {
-            SchedulerGraph<T>.Vertex vertex;
-            ItemsVertex.TryGetValue(item, out vertex);
+            ItemsVertex.TryGetValue(item, out SchedulerGraph<T>.Vertex vertex);
 
             if (vertex != null)
             {
-                SchedulerGraph.RemoveVertex(vertex);
+                SchedulerGraph.UnregisterVertex(vertex);
                 Refresh();
             }
         }
 
         protected void Clear()
         {
-            SchedulerGraph.ClearVertices();
+            SchedulerGraph.Clear();
+
+            foreach (SchedulerGraph<T>.Vertex vertex in ItemsVertex.Values)
+                vertex.UnlinkEdges();
+
             ItemsVertex.Clear();
             Refresh();
         }
@@ -138,7 +142,7 @@ namespace Taskete
         protected internal SchedulerGraph<T>.Vertex AddItemVertex(T item)
         {
             var vertex = new SchedulerGraph<T>.Vertex(item);
-            SchedulerGraph.AddVertex(vertex);
+            SchedulerGraph.RegisterVertex(vertex);
             ItemsVertex.Add(item, vertex);
 
             return vertex;

@@ -4,12 +4,12 @@ using OverGraphed;
 
 namespace Taskete
 {
-    public class SchedulerGraph<T> : Graph<SchedulerGraph<T>.Vertex, SchedulerGraph<T>.Edge>
+    public class SchedulerGraph<T> : AutoGraph<SchedulerGraph<T>.Vertex, SchedulerGraph<T>.Edge>
     {
-        public class Vertex : Vertex<Vertex, Edge>, IVisitable<TopologicalOrderVisitor<T>, Vertex, Vertex, Edge>
+        public class Vertex : SimpleDirectedVertex<Vertex, Edge>
         {
-            public Predicate<object> Predicate { get; set; }
-            public IList<T> Items { get; private set; }
+            public Predicate<object> Predicate { get; }
+            public IList<T> Items { get; }
             public Priority Priority { get; set; }
 
             public Vertex(Predicate<object> insertPredicate)

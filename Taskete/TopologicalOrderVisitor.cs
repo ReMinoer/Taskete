@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using OverGraphed;
 
 namespace Taskete
 {
-    public class TopologicalOrderVisitor<T> : IVisitor<SchedulerGraph<T>.Vertex, SchedulerGraph<T>.Edge>
+    public class TopologicalOrderVisitor<T>
     {
         private readonly List<T> _result;
         private readonly IReadOnlyCollection<T> _readOnlyResult;

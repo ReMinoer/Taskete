@@ -1,4 +1,6 @@
-﻿namespace Taskete.Controllers
+﻿using OverGraphed;
+
+namespace Taskete.Controllers
 {
     public class RelativeController<TController, T> : IRelativeController<RelativeController<TController, T>, T>
     {
@@ -16,8 +18,8 @@
             if (!_scheduler.ItemsVertex.TryGetValue(dependent, out SchedulerGraph<T>.Vertex otherVertex))
                 otherVertex = _scheduler.AddItemVertex(dependent);
 
-            if (!_scheduler.SchedulerGraph.ContainsEdge(otherVertex, _vertex))
-                _scheduler.SchedulerGraph.AddEdge(otherVertex, _vertex, new SchedulerGraph<T>.Edge());
+            if (!_scheduler.SchedulerGraph.ContainsLink(otherVertex, _vertex))
+                new SchedulerGraph<T>.Edge().Link(otherVertex, _vertex);
 
             _scheduler.Refresh();
             return this;
@@ -28,8 +30,8 @@
             if (!_scheduler.ItemsVertex.TryGetValue(dependency, out SchedulerGraph<T>.Vertex otherVertex))
                 otherVertex = _scheduler.AddItemVertex(dependency);
 
-            if (!_scheduler.SchedulerGraph.ContainsEdge(_vertex, otherVertex))
-                _scheduler.SchedulerGraph.AddEdge(_vertex, otherVertex, new SchedulerGraph<T>.Edge());
+            if (!_scheduler.SchedulerGraph.ContainsLink(_vertex, otherVertex))
+                new SchedulerGraph<T>.Edge().Link(_vertex, otherVertex);
 
             _scheduler.Refresh();
             return this;
