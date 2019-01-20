@@ -57,13 +57,8 @@ namespace Taskete
 
         public virtual TController Plan(T item)
         {
-            ItemsVertex.TryGetValue(item, out SchedulerGraph<T>.Vertex vertex);
-
-            if (vertex == null)
-            {
+            if (!ItemsVertex.TryGetValue(item, out SchedulerGraph<T>.Vertex vertex))
                 vertex = Add(item);
-                Refresh();
-            }
 
             return CreateController(vertex);
         }
@@ -71,12 +66,7 @@ namespace Taskete
         void IScheduler<T>.Plan(T item) => Plan(item);
         protected abstract TController CreateController(SchedulerGraph<T>.Vertex vertex);
 
-        public virtual void Unplan(T item)
-        {
-            SchedulerGraph.UnregisterVertex(ItemsVertex[item]);
-            ItemsVertex[item].UnlinkEdges();
-            Refresh();
-        }
+        public virtual void Unplan(T item) => Remove(item);
 
         public void Refresh()
         {
@@ -119,13 +109,21 @@ namespace Taskete
 
         protected void Remove(T item)
         {
-            ItemsVertex.TryGetValue(item, out SchedulerGraph<T>.Vertex vertex);
+            if (!ItemsVertex.TryGetValue(item, out SchedulerGraph<T>.Vertex vertex))
+                return;
 
-            if (vertex != null)
+            if (vertex.Predicate != null)
+            {
+                vertex.Items.Remove(item);
+            }
+            else
             {
                 SchedulerGraph.UnregisterVertex(vertex);
-                Refresh();
+                vertex.UnlinkEdges();
             }
+            
+            ItemsVertex.Remove(item);
+            Refresh();
         }
 
         protected void Clear()
