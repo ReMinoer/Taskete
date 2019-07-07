@@ -2,3 +2,7 @@
 	path = External/OverGraphed
 	url = https://github.com/ReMinoer/OverGraphed.git
 	branch = master
+[submodule "External/Diese"]
+	path = External/Diese
+	url = https://github.com/ReMinoer/Diese.git
+	branch = master
