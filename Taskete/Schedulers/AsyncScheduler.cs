@@ -6,18 +6,18 @@ using Taskete.Schedulers.Base;
 
 namespace Taskete.Schedulers
 {
-    public class AsyncScheduler<T> : SchedulerBase<T>
+    public class AsyncScheduler<T, TParam> : SchedulerBase<T>
     {
-        private readonly Func<T, CancellationToken, Task> _awaitableSelector;
+        private readonly Func<T, TParam, CancellationToken, Task> _awaitableSelector;
         private SchedulerGraph<T> _graph;
 
-        public AsyncScheduler(Func<T, CancellationToken, Task> awaitableSelector)
+        public AsyncScheduler(Func<T, TParam, CancellationToken, Task> awaitableSelector)
         {
             _awaitableSelector = awaitableSelector;
         }
 
-        public Task RunScheduleAsync() => RunScheduleAsync(CancellationToken.None);
-        public async Task RunScheduleAsync(CancellationToken cancellationToken)
+        public Task RunScheduleAsync(TParam param) => RunScheduleAsync(param, CancellationToken.None);
+        public async Task RunScheduleAsync(TParam param, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -29,14 +29,14 @@ namespace Taskete.Schedulers
             var graphCopy = new SchedulerGraph<T>(_graph);
             var graphLock = new SemaphoreSlim(1);
 
-            await Task.WhenAll(graphCopy.GetPendingTasks().Select(x => RunTask(x, graphCopy, graphLock, cancellationToken)));
+            await Task.WhenAll(graphCopy.GetPendingTasks().Select(x => RunTask(x, param, graphCopy, graphLock, cancellationToken)));
         }
 
-        private async Task RunTask(int currentTask, SchedulerGraph<T> graph, SemaphoreSlim graphLock, CancellationToken cancellationToken)
+        private async Task RunTask(int currentTask, TParam param, SchedulerGraph<T> graph, SemaphoreSlim graphLock, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            await _awaitableSelector(Tasks[currentTask], cancellationToken);
+            await _awaitableSelector(Tasks[currentTask], param, cancellationToken);
 
             int[] nextTasks;
             await graphLock.WaitAsync(cancellationToken);
@@ -49,7 +49,7 @@ namespace Taskete.Schedulers
                 graphLock.Release();
             }
 
-            await Task.WhenAll(nextTasks.Select(x => RunTask(x, graph, graphLock, cancellationToken)));
+            await Task.WhenAll(nextTasks.Select(x => RunTask(x, param, graph, graphLock, cancellationToken)));
         }
     }
 }

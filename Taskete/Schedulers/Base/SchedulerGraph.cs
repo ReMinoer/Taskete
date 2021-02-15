@@ -32,11 +32,13 @@ namespace Taskete.Schedulers.Base
         public SchedulerGraph(IList<T> tasks, IEnumerable<ISchedulerRule<T>> rules)
             : this(tasks)
         {
-            foreach (ISchedulerRule<T> rule in rules.OrderBy(x => x.Weight))
+            IEnumerable<ISchedulerRule<T>> orderedValidRules = rules.Where(x => x.IsValid).OrderBy(x => x.Weight);
+            foreach (ISchedulerRule<T> rule in orderedValidRules)
                 rule.Apply(this);
         }
 
         public SchedulerGraph(SchedulerGraph<T> other)
+            : this(other._tasks)
         {
             Array.Copy(other._edges, _edges, _edges.Length);
             Array.Copy(other._followingTasks, _followingTasks, _followingTasks.Length);

@@ -4,6 +4,7 @@
     {
         float Weight { get; }
         bool MustBeApplied { get; }
+        bool IsValid { get; }
         void Apply(ISchedulerGraphBuilder<T> graph);
     }
 }

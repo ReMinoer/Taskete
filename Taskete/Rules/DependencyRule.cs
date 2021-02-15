@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using Taskete.Rules.Base;
 
 namespace Taskete.Rules
@@ -12,6 +13,8 @@ namespace Taskete.Rules
 
         public IEnumerable<T> Predecessors { get; }
         public IEnumerable<T> Successors { get; }
+
+        public override bool IsValid => (Predecessors?.Any() ?? false) && (Successors?.Any() ?? false);
 
         public override event EventHandler Dirty;
 

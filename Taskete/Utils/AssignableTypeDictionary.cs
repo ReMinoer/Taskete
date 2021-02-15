@@ -10,21 +10,18 @@ namespace Taskete.Utils
         private readonly Dictionary<Type, T> _dictionary = new Dictionary<Type, T>();
         private IDictionary<Type, T> Dictionary => _dictionary;
 
-        public bool TryGetValue(Type key, out T value)
+        public IEnumerable<T> GetAllValues(Type key)
         {
             for (Type currentType = key; currentType != null; currentType = currentType.GetTypeInfo().BaseType)
-                if (_dictionary.TryGetValue(currentType, out value))
-                    return true;
+                if (_dictionary.TryGetValue(currentType, out T value))
+                    yield return value;
 
             foreach (Type implementedInterface in key.GetTypeInfo().ImplementedInterfaces)
-                if (_dictionary.TryGetValue(implementedInterface, out value))
-                    return true;
-
-            value = default;
-            return false;
+                if (_dictionary.TryGetValue(implementedInterface, out T value))
+                    yield return value;
         }
 
-        public bool HasValue(Type key)
+        public bool HasValues(Type key)
         {
             for (Type currentType = key; currentType != null; currentType = currentType.GetTypeInfo().BaseType)
                 if (_dictionary.ContainsKey(currentType))
@@ -43,6 +40,8 @@ namespace Taskete.Utils
             set => _dictionary[key] = value;
         }
 
+        public bool TryGetValue(Type key, out T value) => Dictionary.TryGetValue(key, out value);
+
         public void Add(Type key, T value) => _dictionary.Add(key, value);
         public bool Remove(Type key) => _dictionary.Remove(key);
         public void Clear() => _dictionary.Clear();
@@ -51,7 +50,7 @@ namespace Taskete.Utils
         bool ICollection<KeyValuePair<Type, T>>.IsReadOnly => Dictionary.IsReadOnly;
         void ICollection<KeyValuePair<Type, T>>.Add(KeyValuePair<Type, T> item) => Add(item.Key, item.Value);
         bool ICollection<KeyValuePair<Type, T>>.Remove(KeyValuePair<Type, T> item) => Remove(item.Key);
-        bool ICollection<KeyValuePair<Type, T>>.Contains(KeyValuePair<Type, T> item) => HasValue(item.Key);
+        bool ICollection<KeyValuePair<Type, T>>.Contains(KeyValuePair<Type, T> item) => Dictionary.Contains(item);
         void ICollection<KeyValuePair<Type, T>>.CopyTo(KeyValuePair<Type, T>[] array, int arrayIndex) => Dictionary.CopyTo(array, arrayIndex);
 
         ICollection<Type> IDictionary<Type, T>.Keys => Dictionary.Keys;

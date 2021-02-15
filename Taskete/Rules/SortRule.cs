@@ -14,6 +14,8 @@ namespace Taskete.Rules
         public Func<T, TKey> KeySelector { get; }
         public IComparer<TKey> KeyComparer { get; }
 
+        public override bool IsValid => Tasks?.Any() ?? false;
+
         public override event EventHandler Dirty;
 
         public SortRule(IEnumerable<T> tasks, INotifyCollectionChanged tasksChanges, Func<T, TKey> keySelector, IComparer<TKey> keyComparer)

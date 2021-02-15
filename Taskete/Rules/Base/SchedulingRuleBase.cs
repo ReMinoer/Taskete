@@ -6,6 +6,7 @@ namespace Taskete.Rules.Base
     {
         public float Weight { get; set; }
         public bool MustBeApplied { get; set; }
+        public abstract bool IsValid { get; }
         public abstract event EventHandler Dirty;
         public abstract void Apply(ISchedulerGraphBuilder<T> graph);
     }
