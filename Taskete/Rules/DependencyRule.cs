@@ -18,32 +18,18 @@ namespace Taskete.Rules
 
         public override event EventHandler Dirty;
 
-        private DependencyRule(IEnumerable<T> predecessors, INotifyCollectionChanged predecessorsChanges,
-            IEnumerable<T> successors, INotifyCollectionChanged successorsChanges)
+        public DependencyRule(IEnumerable<T> predecessors, IEnumerable<T> successors)
         {
             Predecessors = predecessors;
             Successors = successors;
-            _predecessorsChanges = predecessorsChanges;
-            _successorsChanges = successorsChanges;
+            _predecessorsChanges = predecessors as INotifyCollectionChanged;
+            _successorsChanges = successors as INotifyCollectionChanged;
 
             if (_predecessorsChanges != null)
                 _predecessorsChanges.CollectionChanged += OnCollectionChanged;
             if (_successorsChanges != null)
                 _successorsChanges.CollectionChanged += OnCollectionChanged;
         }
-
-        static public DependencyRule<T> New<TPredecessors, TSuccessors>(TPredecessors predecessors, TSuccessors successors)
-            where TPredecessors : IEnumerable<T>, INotifyCollectionChanged
-            where TSuccessors : IEnumerable<T>, INotifyCollectionChanged
-            => new DependencyRule<T>(predecessors, predecessors, successors, successors);
-        static public DependencyRule<T> New<TPredecessors>(TPredecessors predecessors, IEnumerable<T> successors)
-            where TPredecessors : IEnumerable<T>, INotifyCollectionChanged
-            => new DependencyRule<T>(predecessors, predecessors, successors, null);
-        static public DependencyRule<T> New<TSuccessors>(IEnumerable<T> predecessors, TSuccessors successors)
-            where TSuccessors : IEnumerable<T>, INotifyCollectionChanged
-            => new DependencyRule<T>(predecessors, null, successors, successors);
-        static public DependencyRule<T> New(IEnumerable<T> predecessors, IEnumerable<T> successors)
-            => new DependencyRule<T>(predecessors, null, successors, null);
 
         public override void Apply(ISchedulerGraphBuilder<T> graph)
         {
