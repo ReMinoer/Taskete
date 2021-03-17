@@ -18,8 +18,8 @@ namespace Taskete.Schedulers
 
         private void UpdateSchedule()
         {
-            _schedule.Capacity = Tasks.Count;
             _schedule.Clear();
+            _schedule.Capacity = Tasks.Count;
 
             var graph = new SchedulerGraph<T>(Tasks, Rules);
 

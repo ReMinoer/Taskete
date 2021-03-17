@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace Taskete.Schedulers.Base
 {
@@ -20,16 +23,29 @@ namespace Taskete.Schedulers.Base
             Rules = new DirtySchedulerList<ISchedulerRule<T>>(this);
         }
 
-        private class SchedulerList<TItem> : IList<TItem>
+        private class SchedulerList<TItem> : IList<TItem>, INotifyCollectionChanged, INotifyPropertyChanged
         {
             protected readonly SchedulerBase<T> Scheduler;
-            protected readonly List<TItem> List = new List<TItem>();
+            protected readonly ObservableCollection<TItem> List = new ObservableCollection<TItem>();
 
             public int Count => List.Count;
+
+            public event PropertyChangedEventHandler PropertyChanged;
+            public event NotifyCollectionChangedEventHandler CollectionChanged;
 
             public SchedulerList(SchedulerBase<T> scheduler)
             {
                 Scheduler = scheduler;
+                
+                List.CollectionChanged += (sender, e) =>
+                {
+                    CollectionChanged?.Invoke(this, e);
+
+                    if (e.Action == NotifyCollectionChangedAction.Add
+                        || e.Action == NotifyCollectionChangedAction.Remove
+                        || (e.Action == NotifyCollectionChangedAction.Reset && Count > 0))
+                        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
+                };
             }
 
             public TItem this[int index]

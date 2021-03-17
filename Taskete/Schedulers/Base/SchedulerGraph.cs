@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Taskete.Schedulers.Base
@@ -14,6 +15,8 @@ namespace Taskete.Schedulers.Base
         }
 
         private readonly IList<T> _tasks;
+        public IReadOnlyCollection<T> AllTasks { get; }
+
         private int TaskCount => _tasks.Count;
 
         private readonly Edge[,] _edges;
@@ -23,6 +26,7 @@ namespace Taskete.Schedulers.Base
         protected SchedulerGraph(IList<T> tasks)
         {
             _tasks = tasks;
+            AllTasks = new ReadOnlyCollection<T>(_tasks);
 
             _edges = new Edge[TaskCount, TaskCount];
             _followingTasks = new bool[TaskCount, TaskCount];

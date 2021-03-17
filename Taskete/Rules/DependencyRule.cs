@@ -16,8 +16,6 @@ namespace Taskete.Rules
 
         public override bool IsValid => (Predecessors?.Any() ?? false) && (Successors?.Any() ?? false);
 
-        public override event EventHandler Dirty;
-
         public DependencyRule(IEnumerable<T> predecessors, IEnumerable<T> successors)
         {
             Predecessors = predecessors;
@@ -26,29 +24,22 @@ namespace Taskete.Rules
             _successorsChanges = successors as INotifyCollectionChanged;
 
             if (_predecessorsChanges != null)
-                _predecessorsChanges.CollectionChanged += OnCollectionChanged;
+                _predecessorsChanges.CollectionChanged += OnDirty;
             if (_successorsChanges != null)
-                _successorsChanges.CollectionChanged += OnCollectionChanged;
+                _successorsChanges.CollectionChanged += OnDirty;
         }
 
         public override void Apply(ISchedulerGraphBuilder<T> graph)
         {
-            foreach (T predecessor in Predecessors)
-                foreach (T successor in Successors)
-                    graph.TryAddDependency(predecessor, successor, this);
-        }
-
-        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            Dirty?.Invoke(this, EventArgs.Empty);
+            TryAddDependency(graph, Predecessors, Successors);
         }
 
         public void Dispose()
         {
             if (_predecessorsChanges != null)
-                _predecessorsChanges.CollectionChanged -= OnCollectionChanged;
+                _predecessorsChanges.CollectionChanged -= OnDirty;
             if (_successorsChanges != null)
-                _successorsChanges.CollectionChanged -= OnCollectionChanged;
+                _successorsChanges.CollectionChanged -= OnDirty;
         }
     }
 }

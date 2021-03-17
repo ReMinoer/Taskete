@@ -9,6 +9,8 @@ namespace Taskete.Rules
     public class SortRule<T, TKey> : SchedulingRuleBase<T>, IDisposable
     {
         private readonly INotifyCollectionChanged _tasksChanges;
+        private readonly Action<T, EventHandler> _keyChangeSubscriber;
+        private readonly Action<T, EventHandler> _keyChangeUnsubscriber;
 
         public IEnumerable<T> Tasks { get; }
         public Func<T, TKey> KeySelector { get; }
@@ -16,29 +18,31 @@ namespace Taskete.Rules
 
         public override bool IsValid => Tasks?.Any() ?? false;
 
-        public override event EventHandler Dirty;
-
-        public SortRule(IEnumerable<T> tasks, INotifyCollectionChanged tasksChanges, Func<T, TKey> keySelector, IComparer<TKey> keyComparer)
+        public SortRule(IEnumerable<T> tasks, Func<T, TKey> keySelector, IComparer<TKey> keyComparer,
+            Action<T, EventHandler> keyChangeSubscriber = null, Action<T, EventHandler> keyChangeUnsubscriber = null)
         {
             Tasks = tasks;
-            _tasksChanges = tasksChanges;
+            _tasksChanges = tasks as INotifyCollectionChanged;
 
             if (_tasksChanges != null)
-                _tasksChanges.CollectionChanged += OnCollectionChanged;
+                _tasksChanges.CollectionChanged += OnTasksCollectionChanged;
 
             KeySelector = keySelector;
             KeyComparer = keyComparer;
+
+            _keyChangeSubscriber = keyChangeSubscriber;
+            _keyChangeUnsubscriber = keyChangeUnsubscriber;
         }
 
-        static public SortRule<T, TKey> New<TTasks>(TTasks tasks, Func<T, TKey> keySelector, IComparer<TKey> keyComparer)
-            where TTasks : IEnumerable<T>, INotifyCollectionChanged
-            => new SortRule<T, TKey>(tasks, tasks, keySelector, keyComparer);
-        static public SortRule<T, TKey> New(IEnumerable<T> tasks, Func<T, TKey> keySelector, IComparer<TKey> keyComparer)
-            => new SortRule<T, TKey>(tasks, null, keySelector, keyComparer);
+        public void Dispose()
+        {
+            if (_tasksChanges != null)
+                _tasksChanges.CollectionChanged -= OnTasksCollectionChanged;
+        }
 
         public override void Apply(ISchedulerGraphBuilder<T> graph)
         {
-            IOrderedEnumerable<IGrouping<TKey, T>> groups = Tasks.GroupBy(KeySelector).OrderBy(x => x.Key, KeyComparer);
+            IOrderedEnumerable<IGrouping<TKey, T>> groups = (Tasks ?? graph.AllTasks).GroupBy(KeySelector).OrderBy(x => x.Key, KeyComparer);
             using (IEnumerator<IGrouping<TKey, T>> enumerator = groups.GetEnumerator())
             {
                 if (!enumerator.MoveNext())
@@ -48,25 +52,30 @@ namespace Taskete.Rules
                 while (enumerator.MoveNext())
                 {
                     IEnumerable<T> currentGroup = enumerator.Current;
-
-                    foreach (T previous in previousGroup)
-                        foreach (T current in currentGroup)
-                            graph.TryAddDependency(previous, current, this);
-
+                    TryAddDependency(graph, previousGroup, currentGroup);
                     previousGroup = currentGroup;
                 }
             }
         }
 
-        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void OnTasksCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            Dirty?.Invoke(this, EventArgs.Empty);
-        }
+            OnDirty();
 
-        public void Dispose()
-        {
-            if (_tasksChanges != null)
-                _tasksChanges.CollectionChanged -= OnCollectionChanged;
+            if (e.Action == NotifyCollectionChangedAction.Reset)
+            {
+                foreach (T task in Tasks)
+                    _keyChangeUnsubscriber?.Invoke(task, OnDirty);
+                return;
+            }
+
+            if (e.OldItems != null)
+                foreach (T task in e.OldItems)
+                    _keyChangeUnsubscriber?.Invoke(task, OnDirty);
+
+            if (e.NewItems != null)
+                foreach (T task in e.NewItems)
+                    _keyChangeSubscriber?.Invoke(task, OnDirty);
         }
     }
 }
