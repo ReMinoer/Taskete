@@ -13,11 +13,12 @@ namespace Taskete.Schedulers.Base
             Connected,
             AlmostCycle
         }
-
+        
         private readonly IList<T> _tasks;
+        private readonly Dictionary<T, int> _taskIndices;
         public IReadOnlyCollection<T> AllTasks { get; }
 
-        private int TaskCount => _tasks.Count;
+        private int TaskCount => _taskIndices.Count;
 
         private readonly Edge[,] _edges;
         private readonly bool[,] _followingTasks;
@@ -26,7 +27,16 @@ namespace Taskete.Schedulers.Base
         protected SchedulerGraph(IList<T> tasks)
         {
             _tasks = tasks;
-            AllTasks = new ReadOnlyCollection<T>(_tasks);
+            AllTasks = new ReadOnlyCollection<T>(tasks);
+
+            _taskIndices = new Dictionary<T, int>();
+
+            int i = 0;
+            foreach (T task in tasks)
+            {
+                _taskIndices.Add(task, i);
+                i++;
+            }
 
             _edges = new Edge[TaskCount, TaskCount];
             _followingTasks = new bool[TaskCount, TaskCount];
@@ -36,7 +46,7 @@ namespace Taskete.Schedulers.Base
         public SchedulerGraph(IList<T> tasks, IEnumerable<ISchedulerRule<T>> rules)
             : this(tasks)
         {
-            IEnumerable<ISchedulerRule<T>> orderedValidRules = rules.Where(x => x.IsValid).OrderBy(x => x.Weight);
+            IEnumerable<ISchedulerRule<T>> orderedValidRules = rules.Where(x => x.IsValid).OrderByDescending(x => x.Weight);
             foreach (ISchedulerRule<T> rule in orderedValidRules)
                 rule.Apply(this);
         }
@@ -73,11 +83,11 @@ namespace Taskete.Schedulers.Base
 
         public bool TryAddDependency(T predecessor, T successor, ISchedulerRule<T> rule)
         {
-            int predecessorIndex = _tasks.IndexOf(predecessor);
+            int predecessorIndex = _taskIndices[predecessor];
             if (predecessorIndex == -1)
                 return false;
 
-            int successorIndex = _tasks.IndexOf(successor);
+            int successorIndex = _taskIndices[successor];
             if (successorIndex == -1)
                 return false;
 
@@ -100,8 +110,11 @@ namespace Taskete.Schedulers.Base
         private void Connect(int predecessor, int successor)
         {
             SetAsConnected(predecessor, successor);
-            SetAsFollowingTask(predecessor, successor);
             IncrementIncomingEdge(successor);
+            
+            SetAsFollowingTask(predecessor, successor);
+            if (AreNotConnected(successor, predecessor))
+                SetAsAlmostCycle(successor, predecessor);
 
             for (int i = 0; i < TaskCount; i++)
             {
